@@ -49,7 +49,7 @@ from deker.tools import convert_human_memory_to_bytes
 from deker.types import ArrayLockMeta, CollectionLockMeta, LocksExtensions, LocksTypes, StorageSize
 from deker.uri import Uri
 from deker.warnings import DekerWarning
-
+from mpi4py.futures import MPIPoolExecutor
 
 if TYPE_CHECKING:
     from concurrent.futures import ThreadPoolExecutor
@@ -236,7 +236,7 @@ class Client(SelfLoggerMixin):
             self.__adapter: Optional["BaseCollectionAdapter"] = None
             self.__factory: Optional["BaseAdaptersFactory"] = None
             self.__ctx: Optional[CTX] = None
-            self.__executor: Optional[ThreadPoolExecutor] = executor
+            self.__executor = MPIPoolExecutor(max_workers=workers)
             self.kwargs = kwargs
             self._open()
         except Exception as e:

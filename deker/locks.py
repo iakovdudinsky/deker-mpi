@@ -96,12 +96,12 @@ class ReadArrayLock(BaseLock):
         path = dir_path / (id_ + self.instance.file_ext)
         for file in dir_path.iterdir():
             # Skip lock from current process.
-            if file.name.endswith(f"{os.getpid()}{LocksExtensions.varray_lock.value}"):
+            if file.name.endswith(f"{LocksExtensions.varray_lock.value}"):
                 self.is_locked_with_varray = True
                 return
             # If we've found another varray lock, that not from current process.
-            if file.name.endswith(LocksExtensions.varray_lock.value):  # type: ignore
-                raise DekerLockError(f"Array {array} is locked with {file.name}")
+            # if file.name.endswith(LocksExtensions.varray_lock.value):  # type: ignore
+            #     raise DekerLockError(f"Array {array} is locked with {file.name}")
         try:
             with open(path, "r") as f:
                 fcntl.flock(f, fcntl.LOCK_SH | fcntl.LOCK_NB)
@@ -164,12 +164,12 @@ class WriteArrayLock(BaseLock):
         if array._vid:
             for file in dir_path.iterdir():
                 # Skip lock from current process.
-                if file.name.endswith(f"{os.getpid()}{LocksExtensions.varray_lock.value}"):
+                if file.name.endswith(f"{LocksExtensions.varray_lock.value}"):
                     self.is_locked_with_varray = True
                     return
                 # If we've found another varray lock, that not from current process.
-                if file.name.endswith(LocksExtensions.varray_lock.value):  # type: ignore
-                    raise DekerLockError(f"Array {array} is locked with {file.name}")
+                # if file.name.endswith(LocksExtensions.varray_lock.value):  # type: ignore
+                #     raise DekerLockError(f"Array {array} is locked with {file.name}")
 
         # Increment write lock, to prevent more read locks coming.
         self.acquire(self.get_path(func_args, func_kwargs))

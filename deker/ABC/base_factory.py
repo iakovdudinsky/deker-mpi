@@ -20,6 +20,8 @@ from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Any, Tuple
 
+from mpi4py.futures import MPIPoolExecutor
+
 from deker.log import SelfLoggerMixin
 
 
@@ -38,13 +40,24 @@ class BaseAdaptersFactory(SelfLoggerMixin, ABC):
         self.ctx = ctx
         self.uri = uri
         if self.ctx.executor is None:
-            self.executor: ThreadPoolExecutor = ThreadPoolExecutor(self.ctx.config.workers)
+            self.executor: ThreadPoolExecutor = MPIPoolExecutor(self.ctx.config.workers)
             self.ctx.executor = self.executor
             self._own_executor = True
         else:
             self.executor: ThreadPoolExecutor = self.ctx.executor
             self._own_executor: bool = False
         self.logger.debug(f"{self.__class__.__name__} instantiated")
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['executor']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # self.executor = MPIPoolExecutor(4)
+        # self.ctx.executor = self.executor
+        # self._own_executor = True
 
     def __del__(self) -> None:
         self.close()

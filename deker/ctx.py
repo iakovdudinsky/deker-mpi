@@ -17,6 +17,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Any, Optional, Type
 
+from mpi4py.futures import MPIPoolExecutor
 
 if TYPE_CHECKING:
     from deker.ABC.base_adapters import BaseStorageAdapter
@@ -42,3 +43,12 @@ class CTX:
         self.is_closed = is_closed
         self.config = config
         self.extra: dict = extra if extra else dict()
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['executor']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # self.executor = MPIPoolExecutor(4)
