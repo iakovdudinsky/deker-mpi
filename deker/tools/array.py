@@ -118,8 +118,7 @@ def generate_uid(array_type: ArrayType) -> str:
     if not isinstance(array_type, ArrayType):
         raise TypeError("Invalid argument type. Array type is required")
 
-    namespace = uuid.NAMESPACE_X500 if array_type == ArrayType.array else uuid.NAMESPACE_OID
-    return str(uuid.uuid5(namespace, array_type.value + get_utc().isoformat()))
+    return str(uuid.uuid4())
 
 
 def get_id(array: Any) -> str:
